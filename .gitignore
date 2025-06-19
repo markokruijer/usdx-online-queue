@@ -62,6 +62,7 @@ ppaslink.sh
 /game/*.db
 /game/*.log
 /game/ultrastardx
+/game/avatars/_*
 
 # created by dldlls.py on Windows
 /usdx-dlls-i686.zip
