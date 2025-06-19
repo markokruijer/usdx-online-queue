@@ -2233,6 +2233,7 @@ function GetRequest(url: string): string;
 var
   Client: TFPHttpClient;
 begin
+  Writeln('getting request from: ' + url);
   Client := TFPHttpClient.Create(nil);
   try
     Result := Client.Get(url);
@@ -2243,19 +2244,23 @@ begin
 end;
 
 function PostRequest(url: string; reqBody: string): string;
+
 var
   Client: TFPHttpClient;
   Response: TStringStream;
 //  Params: string = reqBody;//'{"title": "Some note", "content": "Awesome stuff"}';
 begin
+
+  Writeln('posting request to: ' + url);
   Client := TFPHttpClient.Create(nil);
+  // Client.RequestBody := TRawByteStringStream.Create('{"title": "Some note", "content": "Awesome stuff"}');
   Client.RequestBody := TRawByteStringStream.Create(reqBody);
   // Client.OnDataReceived :=; // todo: can this be an async-like callback...?
   Response := TStringStream.Create('');
   try
     try
       Client.Post(url, Response);
-      Writeln('Response Code: ' + IntToStr(Client.ResponseStatusCode)); // better be 200
+      // Writeln('Response Code: ' + IntToStr(Client.ResponseStatusCode)); // better be 200
       Result := Response.DataString;
     except on E: Exception do
       begin
@@ -2293,7 +2298,8 @@ begin
 
   For I := low(CatSongs.Song) to high(CatSongs.Song) do
   begin
-    if (CatSongs.Song[I].Title = Title) and (CatSongs.Song[I].Artist = Artist) then
+    //if (CatSongs.Song[I].Title = Title) and (CatSongs.Song[I].Artist = Artist) then
+    if (LowerCase(CatSongs.Song[I].Title) = LowerCase(Title)) and (LowerCase(CatSongs.Song[I].Artist) = LowerCase(Artist)) then
     begin
       Result := I;
       Break;
@@ -2324,16 +2330,17 @@ begin
   For I := low(SongPlaylistIDsHistory) to high(SongPlaylistIDsHistory) do
     histArr[I] := GetSongPlaylistID(SongPlaylistIDsHistory[I]);
 
-  // writeln('will reload queue '+currentSong.Title+currentSong.Artist);
+  // writeln('will reload queue ');
   resp := PostRequest(Ini.JukeboxQueueServer+'/q-simple', '{"currentSongId":"'+GetSongPlaylistID(CrrntSongID)+'", "songIdHistory": ["'+String.Join('","', histArr)+'"]}');
 
   if resp = '' then
     Exit;
 
-  writeln('got resp: ' + resp);
   strArr := SplitString(resp, 0, SepNewLine);
 
   arr := [];
+
+  // reset and change the playlist here!
 
   For I := low(strArr) to high(strArr) do
   begin
@@ -2676,7 +2683,7 @@ var
   Max: integer;
   CoverPath: IPath;
 begin
-  writeln('playmusic!!!');
+
 
   // background texture (garbage disposal)
   if (Tex_Background.TexNum > 0) then

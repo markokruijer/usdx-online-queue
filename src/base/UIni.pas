@@ -1628,7 +1628,8 @@ begin
   JukeboxEffect := ReadArrayIndex(ILyricsEffect, IniFile, 'Jukebox', 'LyricsEffect', 1);
   JukeboxAlpha := ReadArrayIndex(ILyricsAlpha, IniFile, 'Jukebox', 'LyricsAlpha', 20);
 
-  JukeboxQueueServer := IniFile.ReadString('Jukebox', 'ServerUrl', '');
+  JukeboxQueueServer := IniFile.ReadString('Jukebox', 'ServerUrl', 'http://gateway020.fabriquehq.nl/eidra');
+  // JukeboxQueueServer := IniFile.ReadString('Jukebox', 'ServerUrl', 'https://karaokeq.q42.workers.dev/q42');
 
   JukeboxSongMenu := ReadArrayIndex(IJukeboxSongMenu, IniFile, 'Jukebox', 'SongMenu', IGNORE_INDEX, 'On');
 
