@@ -123,7 +123,7 @@ type
     public
       // Players or Teams colors
       SingColor:      array[0..(IMaxPlayerCount-1)] of integer;
-      
+
       Name:           array[0..15] of UTF8String;
       PlayerColor:    array[0..(IMaxPlayerCount-1)] of integer;
       TeamColor:      array[0..2] of integer;
@@ -1550,7 +1550,7 @@ begin
 
   //AudioRepeat aka VoicePassthrough
   VoicePassthrough := ReadArrayIndex(IVoicePassthrough, IniFile, 'Sound', 'VoicePassthrough', 0);
-  
+
   SoundFont := IniFile.ReadString('Sound', 'SoundFont', '');
 
   // Lyrics Font
@@ -1651,11 +1651,10 @@ begin
   JukeboxEffect := ReadArrayIndex(ILyricsEffect, IniFile, 'Jukebox', 'LyricsEffect', 2);
   JukeboxAlpha := ReadArrayIndex(ILyricsAlpha, IniFile, 'Jukebox', 'LyricsAlpha', 20);
 
-  JukeboxQueueServer := IniFile.ReadString('Jukebox', 'ServerUrl', 'http://gateway020.fabriquehq.nl/eidra');
-  // JukeboxQueueServer := IniFile.ReadString('Jukebox', 'ServerUrl', 'https://karaokeq.q42.workers.dev/q42');
+  JukeboxQueueServer := IniFile.ReadString('Jukebox', 'ServerUrl', 'http://10.20.10.222:8787/jiri');
+  // JukeboxQueueServer := IniFile.ReadString('Jukebox', 'ServerUrl', 'http://gateway020.fabriquehq.nl/eidra');
 
   JukeboxSongMenu := ReadArrayIndex(IJukeboxSongMenu, IniFile, 'Jukebox', 'SongMenu', IGNORE_INDEX, 'On');
-
 
   JukeboxSingLineColor := ReadArrayIndex(IHexSingColor, IniFile, 'Jukebox', 'SingLineColor', High(IHexSingColor));
 

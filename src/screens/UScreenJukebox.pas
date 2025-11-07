@@ -2349,54 +2349,62 @@ begin
   Result := currentSong.Artist + ' : ' + currentSong.Title;
 end;
 
+
 procedure TScreenJukebox.ReloadQueue(CrrntSongID: Integer);
 var
   strArr: array of string;
   arr: array of integer;
   histArr: array of string;
+  invalidSongs: array of string;
   resp: string;
   I: integer;
   J: integer;
   playlist: TStringArray;
   jsonPayload: string;
 const
-  SepNewLine = [#10, #13]; // lf, cr
+  SepNewLine = [#10, #13];
 begin
   SetLength(histArr, Length(SongPlaylistIDsHistory));
   For I := low(SongPlaylistIDsHistory) to high(SongPlaylistIDsHistory) do
     histArr[I] := GetSongPlaylistID(SongPlaylistIDsHistory[I]);
 
-  // writeln('will reload queue ');
-  // MKR; get all current songs from the current playlist
   playlist := GetPlaylistForAPI();
   jsonPayload := '{"playlist": ["' + String.Join('","', playlist) + '"]}';
-  resp := PostRequest(Ini.JukeboxQueueServer+'/q-simple', '{"currentSongId":"'+GetSongPlaylistID(CrrntSongID)+'", "songIdHistory": ["'+String.Join('","', histArr)+'"]}');
-
-  Log.LogInfo('posted request: currentsongid' + GetSongPlaylistID(CrrntSongID) + ' ', 'TScreenJukebox');
-  Log.LogInfo('posted request: songhistory' + String.Join('","', histArr) + ' ', 'TScreenJukebox');
-  Log.LogInfo('posted current playlist: ' + ' {"playlist": ["' + String.Join('","', playlist) + '"]} ', 'TScreenJukebox');
+  resp := PostRequest(Ini.JukeboxQueueServer+'/q-simple',
+    '{"currentSongId":"'+GetSongPlaylistID(CrrntSongID)+'", "songIdHistory": ["'+String.Join('","', histArr)+'"]}');
 
   if resp = '' then
     Exit;
 
   strArr := SplitString(resp, 0, SepNewLine);
-
   arr := [];
-
-  // reset and change the playlist here!
+  SetLength(invalidSongs, 0);
 
   For I := low(strArr) to high(strArr) do
   begin
     J := FindSongByPlaylistSongID(strArr[I]);
     if J >= 0 then
     begin
-      SetLength(arr, Length(arr)+1);
+      SetLength(arr, Length(arr) + 1);
       arr[High(arr)] := J;
+    end
+    else
+    begin
+      // Track not found locally - mark as invalid
+      SetLength(invalidSongs, Length(invalidSongs) + 1);
+      invalidSongs[High(invalidSongs)] := strArr[I];
+      Log.LogWarn('Song not available locally: ' + strArr[I], 'ReloadQueue');
     end;
   end;
 
-  // todo: when calling this I seem to be getting sometimes the weirdest skips...
-  // likely that I'm settings these at sub-ideal times...?
+  // Report invalid songs back to API to remove them from the queue
+  if Length(invalidSongs) > 0 then
+  begin
+    jsonPayload := '{"invalidSongs": ["' + String.Join('","', invalidSongs) + '"]}';
+    PostRequest(Ini.JukeboxQueueServer+'/flush-invalid', jsonPayload);
+    Log.LogInfo('Flushed payload ' + jsonPayload , 'ReloadQueue');
+    Log.LogInfo('Flushed ' + IntToStr(Length(invalidSongs)) + ' invalid songs from queue', 'ReloadQueue');
+  end;
 
   SetLength(JukeboxSongsList, Length(arr));
   JukeboxSongsList := arr;
@@ -2406,10 +2414,10 @@ begin
   ActualInteraction := 0;
   ListMin := 0;
   Interaction := 0;
-
   CurrentSongList := 0;
   CatSongs.Selected := JukeboxVisibleSongs[CurrentSongList];
 end;
+
 
 function TScreenJukebox.Draw: boolean;
 var
