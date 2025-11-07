@@ -170,6 +170,12 @@ begin
     Log.LogWarn('Log directory "'+ Platform.GetLogPath.ToNative +'" not available', 'UPathUtils.InitializePaths');
   end;
 
+  // Add this right after enabling logging
+  if Assigned(LogPath) then
+    WriteLn('Log path: ' + Platform.GetLogPath.ToNative)
+  else
+    WriteLn('LogPath is nil!');
+
   SharedPath := Platform.GetGameSharedPath;
   UserPath := Platform.GetGameUserPath;
 

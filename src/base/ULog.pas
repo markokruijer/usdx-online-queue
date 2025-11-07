@@ -39,13 +39,13 @@ uses
 
 (*
  * LOG_LEVEL_[TYPE] defines the "minimum" index for logs of type TYPE. Each
- * level greater than this BUT less or equal than LOG_LEVEL_[TYPE]_MAX is of this type.  
+ * level greater than this BUT less or equal than LOG_LEVEL_[TYPE]_MAX is of this type.
  * This means a level "LOG_LEVEL_ERROR >= Level <= LOG_LEVEL_ERROR_MAX" e.g.
  * "Level := LOG_LEVEL_ERROR+2" is considered an error level.
  * This is nice for debugging if you have more or less important debug messages.
  * For example you can assign LOG_LEVEL_DEBUG+10 for the more important ones and
  * LOG_LEVEL_DEBUG+20 for less important ones and so on. By changing the log-level
- * you can hide the less important ones.  
+ * you can hide the less important ones.
  *)
 const
   LOG_LEVEL_DEBUG_MAX    = MaxInt;
@@ -147,7 +147,7 @@ uses
   DateUtils,
   URecord,
   UMain,
-  UMusic,  
+  UMusic,
   UTime,
   UCommon,
   UCommandLine,
@@ -155,7 +155,7 @@ uses
 
 (*
  * Write to console if in debug mode (Thread-safe).
- * If debug-mode is disabled nothing is done. 
+ * If debug-mode is disabled nothing is done.
  *)
 procedure DebugWriteln(const aString: string);
 begin
@@ -371,7 +371,7 @@ begin
       DebugWriteLn(LogMsg);
       LogConsole(LogMsg);
     end;
-    
+
     // write message to log-file
     if (Level <= LogFileLevel) then
     begin
@@ -500,7 +500,7 @@ begin
 
   // open output file
   Stream := TBinaryFileStream.Create(FileName, fmCreate);
-  
+
   // write wav-file header
   if (UseWavFile) then
   begin

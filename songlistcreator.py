@@ -12,6 +12,8 @@ def process_song_folder(song_folder):
     song_name = os.path.basename(song_folder)
     # Replace '-' with ' : ' for the id
     song_id = song_name.replace('-', ':')
+    #todo ë for example gives issues, probably in the parsing in pascal where shit goes awol...
+    #flatten everything to latin alfphabet only would make sense
     # Example: random year and timestamp (customize as needed)
     year = random.choice([1993, 1997])
     timestamp = 1673742039  # Or use random.randint(...) or int(time.time())
@@ -37,8 +39,8 @@ def generate_music_json(root_dir):
     return output
 
 if __name__ == "__main__":
-    root_folder ="/Users/marko/Music/UltraStar Deluxe"  # Change to your music root directory
-    output_file = "songlist.json"  # Default output file
+    root_folder ="/Users/marko/Downloads/ultra/index"  # Change to your music root directory
+    output_file = "songlist-10-2025.json"  # Default output file
 
     # Optionally allow command-line arguments for folder and output file
     if len(sys.argv) > 1:

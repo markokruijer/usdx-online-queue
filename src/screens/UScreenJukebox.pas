@@ -154,6 +154,7 @@ type
     JukeboxSongListFixPin: integer;
     JukeboxPlayPause:      integer;
 
+
     Filter:         UTF8String;
 
     FindSongList:   boolean;
@@ -248,6 +249,7 @@ type
     procedure ReloadQueue(CrrntSongID: integer);
 
     function GetSongPlaylistID(SongID: integer): String;
+    function GetPlaylistForAPI(): TStringArray;
 
     procedure RefreshCover;
     procedure DrawPlaylist;
@@ -2250,6 +2252,7 @@ var
   Client: TFPHttpClient;
 begin
   Writeln('getting request from: ' + url);
+  Log.LogInfo('getting request from: ' + url, 'TScreenJukebox');
   Client := TFPHttpClient.Create(nil);
   try
     Result := Client.Get(url);
@@ -2267,7 +2270,8 @@ var
 //  Params: string = reqBody;//'{"title": "Some note", "content": "Awesome stuff"}';
 begin
 
-  Writeln('posting request to: ' + url);
+  Log.LogInfo('Posting request to: ' + url, 'TScreenJukebox');
+
   Client := TFPHttpClient.Create(nil);
   // Client.RequestBody := TRawByteStringStream.Create('{"title": "Some note", "content": "Awesome stuff"}');
   Client.RequestBody := TRawByteStringStream.Create(reqBody);
@@ -2323,6 +2327,20 @@ begin
   end;
 end;
 
+
+// New function to get playlist for the API output
+function TScreenJukebox.GetPlaylistForAPI(): TStringArray;
+var
+  I: Integer;
+begin
+  SetLength(Result, Length(JukeboxVisibleSongs));
+
+  For I := Low(JukeboxVisibleSongs) to High(JukeboxVisibleSongs) do
+  begin
+    Result[I] := GetSongPlaylistID(JukeboxVisibleSongs[I]);
+  end;
+end;
+
 function TScreenJukebox.GetSongPlaylistID(SongID: integer): String;
 var
   currentSong: TSong;
@@ -2339,6 +2357,8 @@ var
   resp: string;
   I: integer;
   J: integer;
+  playlist: TStringArray;
+  jsonPayload: string;
 const
   SepNewLine = [#10, #13]; // lf, cr
 begin
@@ -2347,7 +2367,14 @@ begin
     histArr[I] := GetSongPlaylistID(SongPlaylistIDsHistory[I]);
 
   // writeln('will reload queue ');
+  // MKR; get all current songs from the current playlist
+  playlist := GetPlaylistForAPI();
+  jsonPayload := '{"playlist": ["' + String.Join('","', playlist) + '"]}';
   resp := PostRequest(Ini.JukeboxQueueServer+'/q-simple', '{"currentSongId":"'+GetSongPlaylistID(CrrntSongID)+'", "songIdHistory": ["'+String.Join('","', histArr)+'"]}');
+
+  Log.LogInfo('posted request: currentsongid' + GetSongPlaylistID(CrrntSongID) + ' ', 'TScreenJukebox');
+  Log.LogInfo('posted request: songhistory' + String.Join('","', histArr) + ' ', 'TScreenJukebox');
+  Log.LogInfo('posted current playlist: ' + ' {"playlist": ["' + String.Join('","', playlist) + '"]} ', 'TScreenJukebox');
 
   if resp = '' then
     Exit;
@@ -2880,6 +2907,10 @@ begin
   // Update history: push to end, if length > 5 then remove item at beginning
   // (only doing this when the current id is not already the last one in the list because we sometimes get double triggers of playing as song)
   // writeln('range check? ' + InttoStr(low(SongPlaylistIDsHistory))+'   '+InttoStr(High(SongPlaylistIDsHistory)));
+
+  Log.LogInfo('range check for history: ' + InttoStr(low(SongPlaylistIDsHistory))+'   '+InttoStr(High(SongPlaylistIDsHistory)), 'TScreenJukebox');
+
+
   if (High(SongPlaylistIDsHistory) = -1) or (CurrentSongID <> SongPlaylistIDsHistory[High(SongPlaylistIDsHistory)]) then begin
     SetLength(SongPlaylistIDsHistory, Length(SongPlaylistIDsHistory)+1);
     SongPlaylistIDsHistory[High(SongPlaylistIDsHistory)] := CurrentSongID;
