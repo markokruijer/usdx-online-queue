@@ -729,6 +729,9 @@ begin
   Statics[screenSingViewRef.SongNameStatic].Visible := false;
   Text[screenSingViewRef.SongNameText].Visible := false;
 
+
+  CheckPlayerConfigOnNextSong := false;
+  // skip check for now
   BadPlayer := AudioInputProcessor.CheckPlayersConfig(PlayersPlay);
   if (BadPlayer <> 0) and CheckPlayerConfigOnNextSong then
   begin

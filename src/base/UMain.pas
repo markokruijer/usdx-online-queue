@@ -118,7 +118,7 @@ begin
     Platform.Init;
     Log.Title := WindowTitle;
     Log.FileOutputEnabled := true;
-    
+
     // Commandline Parameter Parser
     Params := TCMDParams.Create;
 
@@ -217,7 +217,7 @@ begin
     begin
       InitializeJoystick;
     end;
-    
+
     // Webcam
     //Log.LogStatus('WebCam', 'Initialization');
     Webcam := TWebcam.Create;
@@ -244,23 +244,27 @@ begin
       *}
     SoundLib.StartBgMusic;
 
+
     // check microphone settings, goto record options if they are corrupt
-    BadPlayer := AudioInputProcessor.ValidateSettings;
-    if (BadPlayer <> 0) then
-    begin
-      ScreenPopupError.ShowPopup(
-          Format(Language.Translate('ERROR_PLAYER_DEVICE_ASSIGNMENT'),
-          [BadPlayer]));
-      Display.CurrentScreen^.FadeTo( @ScreenOptionsRecord );
-    end;
-    BadPlayer := AudioInputProcessor.CheckPlayersConfig(1);
-    if (BadPlayer <> 0) then
-    begin
-      ScreenPopupError.ShowPopup(
-          Format(Language.Translate('ERROR_PLAYER_NO_DEVICE_ASSIGNMENT'),
-          [BadPlayer]));
-      Display.CurrentScreen^.FadeTo( @ScreenOptionsRecord );
-    end;
+    // disable check. right to jb mode
+    //BadPlayer := AudioInputProcessor.ValidateSettings;
+    //if (BadPlayer <> 0) then
+    //begin
+    //  ScreenPopupError.ShowPopup(
+    //      Format(Language.Translate('ERROR_PLAYER_DEVICE_ASSIGNMENT'),
+    //      [BadPlayer]));
+    //  Display.CurrentScreen^.FadeTo( @ScreenOptionsRecord );
+    //end;
+    //BadPlayer := AudioInputProcessor.CheckPlayersConfig(1);
+    //if (BadPlayer <> 0) then
+    //begin
+    //  ScreenPopupError.ShowPopup(
+    //      Format(Language.Translate('ERROR_PLAYER_NO_DEVICE_ASSIGNMENT'),
+    //      [BadPlayer]));
+    //  Display.CurrentScreen^.FadeTo( @ScreenOptionsRecord );
+    //end;
+
+    Display.CurrentScreen^.FadeTo( @ScreenJukebox );
 
     //------------------------------
     // Start Mainloop
